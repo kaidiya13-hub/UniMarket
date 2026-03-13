@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card border-danger mb-3">
+            <div class="card-header bg-danger text-white">Confirm Deletion</div>
+            <div class="card-body text-danger">
+                <h5 class="card-title">Are you sure you want to delete "{{ item.title }}"?</h5>
+                <p class="card-text">This action cannot be undone. The item will be permanently removed from the marketplace.</p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, Delete Item</button>
+                    <a href="{% url 'seller_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

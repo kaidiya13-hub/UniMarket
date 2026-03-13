@@ -35,13 +35,15 @@
                         </p>
                         
                         <div class="mt-3">
-                            <button class="btn btn-outline-primary btn-sm me-2">Edit</button>
+                            <a href="{% url 'edit_item' item.id %}" class="btn btn-outline-primary btn-sm me-2">Edit</a>
+                            
                             {% if item.status == 'Active' %}
                                 <button class="btn btn-outline-warning btn-sm me-2 mark-sold-btn" data-item-id="{{ item.id }}">Mark as Sold</button>
                             {% endif %}
-                            <button class="btn btn-outline-danger btn-sm">Delete</button>
+                            
+                            <a href="{% url 'delete_item' item.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
                         </div>
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
@@ -52,6 +54,7 @@
         {% endfor %}
     </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const markSoldButtons = document.querySelectorAll('.mark-sold-btn');
@@ -61,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const itemId = this.getAttribute('data-item-id');
             const url = `/items/mark-sold/${itemId}/`;
 
-            // Django requires CSRF token for POST requests via AJAX
             function getCookie(name) {
                 let cookieValue = null;
                 if (document.cookie && document.cookie !== '') {
@@ -78,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             const csrftoken = getCookie('csrftoken');
 
-            // Send async POST request to the backend
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -89,13 +90,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update UI immediately without refreshing the page
                     const badge = document.getElementById(`status-badge-${itemId}`);
                     badge.textContent = 'Sold';
                     badge.classList.remove('bg-success');
                     badge.classList.add('bg-danger');
-
-                    // Hide the 'Mark as Sold' button since it's already sold
                     this.style.display = 'none';
                 }
             })

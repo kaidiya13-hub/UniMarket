@@ -50,3 +50,32 @@ def mark_as_sold(request, item_id):
     
     # Return error if not a POST request
     return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+# Edit an existing item (Requirement S1/S2 context)
+@login_required(login_url='/admin/login/')
+def edit_item(request, item_id):
+    # Ensure the user can only edit their own items
+    item = get_object_or_404(Item, id=item_id, seller=request.user)
+    
+    if request.method == 'POST':
+        # Pass the existing item instance to the form to update it
+        form = ItemForm(request.POST, request.FILES, instance=item)
+        if form.is_valid():
+            form.save()
+            return redirect('seller_dashboard')
+    else:
+        # Pre-fill the form with existing item data
+        form = ItemForm(instance=item)
+        
+    return render(request, 'items/edit_item.html', {'form': form, 'item': item})
+
+# Delete an item safely
+@login_required(login_url='/admin/login/')
+def delete_item(request, item_id):
+    # Ensure the user can only delete their own items
+    item = get_object_or_404(Item, id=item_id, seller=request.user)
+    
+    if request.method == 'POST':
+        item.delete()
+        return redirect('seller_dashboard')
+        
+    return render(request, 'items/delete_confirm.html', {'item': item})
