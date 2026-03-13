@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Chat with Seller</h2>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h4>{{ item.title }}</h4>
+            <p><strong>Seller:</strong> {{ item.seller.username }}</p>
+            <p><strong>Price:</strong> £{{ item.price }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body" id="chat-box" style="min-height: 300px; max-height: 400px; overflow-y: auto; background-color: #f8f9fa;">
+            {% for message in messages %}
+                {% if message.sender == request.user %}
+                    <div class="d-flex justify-content-end mb-3">
+                        <div class="p-3 rounded" style="max-width: 70%; background-color: #cfe2ff;">
+                            <strong>{{ message.sender.username }}</strong>
+                            <p class="mb-1">{{ message.content }}</p>
+                            <small class="text-muted">{{ message.timestamp }}</small>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="d-flex justify-content-start mb-3">
+                        <div class="p-3 rounded border bg-white" style="max-width: 70%;">
+                            <strong>{{ message.sender.username }}</strong>
+                            <p class="mb-1">{{ message.content }}</p>
+                            <small class="text-muted">{{ message.timestamp }}</small>
+                        </div>
+                    </div>
+                {% endif %}
+            {% empty %}
+                <p>No messages yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="message-input" class="form-label">Message</label>
+        <textarea
+            id="message-input"
+            class="form-control"
+            rows="3"
+            placeholder="Type your message here"
+        ></textarea>
+    </div>
+
+    <button id="send-btn" class="btn btn-primary">Send</button>
+    <a href="/marketplace/" class="btn btn-secondary">Back to Marketplace</a>
+</div>
+
+<script>
+function renderMessages(messages) {
+    const chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML = "";
+
+    if (messages.length === 0) {
+        chatBox.innerHTML = "<p>No messages yet.</p>";
+        return;
+    }
+
+    messages.forEach(message => {
+        const isCurrentUser = message.sender === "{{ request.user.username }}";
+
+        const wrapper = document.createElement("div");
+        wrapper.className = isCurrentUser ? "d-flex justify-content-end mb-3" : "d-flex justify-content-start mb-3";
+
+        const messageDiv = document.createElement("div");
+        messageDiv.className = isCurrentUser ? "p-3 rounded" : "p-3 rounded border bg-white";
+        messageDiv.style.maxWidth = "70%";
+        if (isCurrentUser) {
+            messageDiv.style.backgroundColor = "#cfe2ff";
+        }
+
+        messageDiv.innerHTML =
+            "<strong>" + message.sender + "</strong>" +
+            "<p class='mb-1'>" + message.content + "</p>" +
+            "<small class='text-muted'>" + message.timestamp + "</small>";
+
+        wrapper.appendChild(messageDiv);
+        chatBox.appendChild(wrapper);
+    });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function loadMessages() {
+    fetch("/chat/{{ item.id }}/messages/")
+        .then(response => response.json())
+        .then(data => {
+            renderMessages(data.messages);
+        });
+}
+
+document.getElementById("send-btn").onclick = function () {
+    const messageInput = document.getElementById("message-input");
+    const message = messageInput.value.trim();
+
+    if (!message) {
+        alert("Message cannot be empty");
+        return;
+    }
+
+    fetch("/chat/{{ item.id }}/{{ item.seller.id }}/send/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: "content=" + encodeURIComponent(message)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            messageInput.value = "";
+            loadMessages();
+        } else {
+            alert(data.error);
+        }
+    });
+};
+
+setInterval(loadMessages, 3000);
+</script>
+{% endblock %}

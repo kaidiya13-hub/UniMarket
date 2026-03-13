@@ -79,3 +79,6 @@ def delete_item(request, item_id):
         return redirect('seller_dashboard')
         
     return render(request, 'items/delete_confirm.html', {'item': item})
+def item_detail(request, item_id):
+    item = get_object_or_404(Item, id=item_id)
+    return render(request, 'items/item_detail.html', {'item': item})
