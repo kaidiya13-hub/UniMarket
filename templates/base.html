@@ -18,9 +18,16 @@
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'marketplace' %}">HOME</a></li> {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link text-success fw-bold" href="{% url 'post_item' %}">POST</a></li> <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">ME</a></li> <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">LOGOUT</a></li> {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">LOGIN</a></li> <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">SIGN UP</a></li> {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'marketplace' %}">HOME</a></li> 
+                    {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link text-success fw-bold" href="{% url 'post_item' %}">POST</a></li> 
+                        <li class="nav-item"><a class="nav-link" href="{% url 'seller_dashboard' %}">DASHBOARD</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">ME</a></li> 
+                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">LOGOUT</a></li> 
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">LOGIN</a></li> 
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">SIGN UP</a></li> 
+                    {% endif %}
                 </ul>
             </div>
         </div>
