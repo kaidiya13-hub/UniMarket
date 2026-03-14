@@ -13,6 +13,11 @@ def register(request):
         if p != cp:
             messages.error(request, "Passwords do not match!")
             return render(request, 'accounts/register.html')
+        
+        # Backend validation: Ensure email has a .edu suffix
+        if not e.lower().endswith('.edu'):
+            messages.error(request, "A valid university email (.edu) is required.")
+            return render(request, 'accounts/register.html')
             
         if not User.objects.filter(username=u).exists():
             User.objects.create_user(username=u, email=e, password=p)
