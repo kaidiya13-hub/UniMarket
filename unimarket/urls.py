@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('items/', include('items.urls')),
+    path('accounts/', include('accounts.urls')), # 添加这一行，关联你的模块
     path('', include('chat.urls')),
 ]
 
